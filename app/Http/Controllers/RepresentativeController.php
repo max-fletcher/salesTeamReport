@@ -1,0 +1,134 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Call;
+use Illuminate\Support\Facades\Auth;
+
+class RepresentativeController extends Controller
+{
+    public function index(){
+        $representatives =  User::all()->sortBy('representative_id');       
+        return view('representatives.index')->with('representatives', $representatives);
+    }
+
+    public function create(){
+        if(Auth::user()->isAdmin){
+            return view('representatives.create');
+        }
+        else{
+            return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
+        }
+    }
+
+    public function store(Request $request){
+
+        if(Auth::user()->isAdmin){
+            //validation
+            $request->validate([
+                'representative_id' => 'required|unique:users,representative_id',
+                'name' => 'required|string|max:255',            
+                'username' => 'required|string|min:3|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'confirm_password' => 'required|string|min:8'
+            ]);    
+            
+            $duplicate_user = User::where('representative_id', $request->representative)->first();
+            $user_with_same_name = User::where('username', $request->username)->first();
+            
+            if(Auth::user()->isAdmin && $duplicate_user && (Auth::user()->representative_id != $duplicate_user->representative_id) ){
+                return back()->with('error', 'A Representative with that ID already exists !!');            
+            }
+
+            if(Auth::user()->isAdmin && $user_with_same_name && (Auth::user()->username != $user_with_same_name->username)){
+                return back()->with('error', 'A Representative with that Username already exists !!');            
+            }
+
+            if($request->password == $request->confirm_password){
+                $user = new User();
+                $user->representative_id = $request->representative_id;
+                $user->name = $request->name;
+                $user->username = $request->username;
+                $user->password = bcrypt($request->password);
+                $user->save();                
+
+                return redirect()->route('representatives.create')->with('success', 'User Created Successfully !!');        
+            }
+            else{
+                return redirect()->route('representatives.create')->with('error', 'Passwords Do Not Match !!');        
+            }   
+        }                
+        else{
+            return redirect()->route()->with('error', 'Access Denied !! Admin privilege is required.');
+        }                     
+    }    
+
+    public function edit($representative_id){
+        if(Auth::user()->isAdmin || Auth::user()->representative_id == $representative_id){
+            $representative = User::where('representative_id', $representative_id)->first();               
+            return view('representatives.edit')->with('representative', $representative);
+        }
+        else{
+            return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
+        }        
+    }
+
+    public function update(Request $request){
+
+        if(Auth::user()->isAdmin || Auth::user()->representative_id == $request->representative_id){
+            $request->validate([
+                'representative_id' => 'required',
+                'name' => 'required|string|max:255',            
+                'username' => 'required|string|min:3|max:255',       
+            ]);                                    
+            
+            $duplicate_user = User::where('representative_id', $request->representative)->first();
+            $user_with_same_name = User::where('username', $request->username)->first();
+            
+            if(Auth::user()->isAdmin && $duplicate_user && (Auth::user()->representative_id != $duplicate_user->representative_id) ){
+                return back()->with('error', 'A Representative with that ID already exists !!');            
+            }
+
+            if(Auth::user()->isAdmin && $user_with_same_name && (Auth::user()->username != $user_with_same_name->username)){
+                return back()->with('error', 'A Representative with that Username already exists !!');            
+            }
+            
+            $user = User::find($request->id);
+            // Change the representative ids of all calls that were associated with this user so they can still have a relation between them
+            Call::where('representative_id', '=', $user->representative_id)->update(['representative_id' => $request->representative_id]);
+            $user->representative_id = $request->representative_id;
+            $user->name = $request->name;
+            $user->username = $request->username;
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            return redirect()->route('representatives.index')->with('success', 'User Updated Successfully !!');       
+        }
+        else{
+            return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
+        }        
+    }
+
+    public function delete($representative_id){
+        if(Auth::user()->isAdmin){
+            $representative = User::where('representative_id', $representative_id)->first();
+            return view('representatives.delete')->with('representative', $representative);   
+        }
+        else{
+            return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
+        }        
+    }
+
+    public function destroy($id){ 
+        if(Auth::user()->isAdmin){
+            $representative = User::find($id);        
+            $representative->delete();
+            return redirect()->route('representatives.index')->with('success', 'Representative Deleted Successfully !!');
+        }
+        else{
+            return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
+        }                
+    }
+}
