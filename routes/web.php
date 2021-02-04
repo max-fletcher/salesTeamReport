@@ -17,15 +17,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes(['register' => false]);
+Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::get('/representative/index', [App\Http\Controllers\RepresentativeController::class, 'index'])->name('representatives.index');
     Route::get('/representative/create', [App\Http\Controllers\RepresentativeController::class, 'create'])->name('representatives.create');
     Route::post('/representative/store', [App\Http\Controllers\RepresentativeController::class, 'store'])->name('representatives.store');
-    Route::get('/representative/edit/{representative_id}', [App\Http\Controllers\RepresentativeController::class, 'edit'])->name('representatives.edit');
-    Route::patch('/representative/update', [App\Http\Controllers\RepresentativeController::class, 'update'])->name('representatives.update');
+    // Fix Later
+    //Route::get('/representative/edit/{representative_id}', [App\Http\Controllers\RepresentativeController::class, 'edit'])->name('representatives.edit');
+    //Route::patch('/representative/update', [App\Http\Controllers\RepresentativeController::class, 'update'])->name('representatives.update');
     Route::get('/representative/delete/{representative_id}', [App\Http\Controllers\RepresentativeController::class, 'delete'])->name('representatives.delete');
     Route::delete('/representative/destroy/{id}', [App\Http\Controllers\RepresentativeController::class, 'destroy'])->name('representatives.destroy');
 
@@ -42,5 +43,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calls/generate_summary_without_users', [App\Http\Controllers\CallController::class, 'generate_summary_without_users'])->name('calls.generate_summary_without_users');
     Route::post('/calls/retrieve_summary_with_users', [App\Http\Controllers\CallController::class, 'retrieve_summary_with_users'])->name('calls.retrieve_summary_with_users');    
     Route::post('/calls/retrieve_summary_without_users', [App\Http\Controllers\CallController::class, 'retrieve_summary_without_users'])->name('calls.retrieve_summary_without_users');    
+    
+    Route::get('/calls/result_of_summary_with_users', [App\Http\Controllers\CallController::class, 'result_of_summary_with_users'])->name('calls.result_of_summary_with_users');
+    Route::get('/calls/result_of_summary_without_users', [App\Http\Controllers\CallController::class, 'result_of_summary_without_users'])->name('calls.result_of_summary_without_users');
 });
 

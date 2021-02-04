@@ -45,8 +45,8 @@
     {{-- datepicker --}}
     <script type="text/javascript">
 
-    $( "#fromdate" ).datepicker({ dateFormat: 'dd-mm-yy' });
-    $( "#todate" ).datepicker({ dateFormat: 'dd-mm-yy' });
+    $( "#fromdate" ).datepicker({ dateFormat: 'dd/mm/yy' });
+    $( "#todate" ).datepicker({ dateFormat: 'dd/mm/yy' });
 
     </script>
     

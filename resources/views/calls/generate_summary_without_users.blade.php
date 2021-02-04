@@ -13,38 +13,4 @@
             <input type="submit" class="btn btn-primary px-3 py-1" value="Submit">
         </div>
     </form>    
-
-    @isset($calls)
-    <div class="my-3">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th> Representative_ID </th>
-                    <th> Name </th>
-                    <th> No. of Calls </th>
-                    <th> Positive </th>
-                    <th> Got Admitted </th>    
-                    <th> Date </th>
-                    <th> Edit </th>    
-                    <th> Delete </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($calls as $call)
-                <tr>
-                    <td> {{ $call->representative_id }} </td>
-                    <td> {{ $call->user->name }} </td>
-                    <td> {{ $call->number_of_calls }} </td>
-                    <td> {{ $call->positive }} </td>
-                    <td> {{ $call->get_admitted }} </td>
-                    <td> {{ $call->created_at->format('d/m/Y') }} </td>
-                    <td> <a class="btn btn-info" href="{{ route('calls.edit', $call->id) }}"> Edit </a> </td>
-                    <td> <a class="btn btn-danger" href="{{ route('calls.delete', $call->id) }}"> Delete </a> </td>
-                </tr>                           
-                @endforeach              
-            </tbody>
-        </table>
-    </div>
-    @endisset    
-
 @endsection

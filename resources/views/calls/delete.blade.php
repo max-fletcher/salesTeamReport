@@ -9,7 +9,11 @@
                 
                 <ul class="list-group list-group-flush">                    
                     <h5> <li class="list-group-item"> Representative ID: {{ $call->representative_id }}</li> </h5>
-                    <h5> <li class="list-group-item"> Name: {{ $call->user->name }}</li> </h5>
+                    @isset($call->user->name)
+                        <h5> <li class="list-group-item"> Name: {{ $call->user->name }}</li> </h5>
+                    @else
+                        <h5> <li> User Deleted From Database !! </li>  </h5>
+                    @endisset
                     <h5> <li class="list-group-item"> No. of Calls: {{ $call->number_of_calls }} </li> </h5>
                     <h5> <li class="list-group-item"> Positive:{{ $call->positive }} </li> </h5>                    
                     <h5> <li class="list-group-item"> Got Admitted:{{ $call->get_admitted }} </li> </h5>

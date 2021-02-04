@@ -23,9 +23,9 @@
         </div>
     </form>    
 
-    @isset($calls)
+    {{-- @isset($calls)
     <div class="my-3">
-        <table class="table table-striped">
+        <table class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th> Representative_ID </th>
@@ -50,10 +50,18 @@
                     <td> <a class="btn btn-info" href="{{ route('calls.edit', $call->id) }}"> Edit </a> </td>
                     <td> <a class="btn btn-danger" href="{{ route('calls.delete', $call->id) }}"> Delete </a> </td>
                 </tr>                           
-                @endforeach              
+                @endforeach  
+                @isset( $total_number_of_calls )
+                <tr class="">
+                    <th class="text-center" colspan="2">Total</th>
+                    <th>{{ $total_number_of_calls }}</th>
+                    <th>{{ $total_positive }}</th>
+                    <th>{{ $total_get_admitted }}</th>
+                </tr>         
+                @endisset
             </tbody>
         </table>
     </div>
-    @endisset    
+    @endisset     --}}
 
 @endsection

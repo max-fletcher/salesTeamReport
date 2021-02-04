@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<h3> Create Representatives </h3>  
+<h3> Create Call Entries </h3>  
 <form action="{{ route('calls.store') }}" method="post" enctype="multipart/form-data">
     @csrf
     @if(auth()->user()->isAdmin)
@@ -38,8 +38,7 @@
     <div class="form-group">
         <label for="body"> Students Who Got Admitted: </label>
         <input type="number" class="form-control" name="got_admitted" id="got_admitted" placeholder="Enter Number of Students Who Got Admitted" value="{{ old('got_admitted') }}"></input>
-    </div>
-
+    </div>      
         <br>
         <input type="submit" class="btn btn-primary" value="Submit">
     </form>

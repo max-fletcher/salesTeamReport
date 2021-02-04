@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class CallController extends Controller
 {
     public function index(){
-        $calls = Call::all()->sortByDesc('created_at');
+        $calls = Call::all()->sortByDesc('created_at');              
         return view('calls.index')->with('calls', $calls);
     }
 
@@ -22,8 +22,7 @@ class CallController extends Controller
         return view('calls.create')->with('representatives', $representatives);
         }
         else{
-            $representative = Auth::user();
-            //dd($representatives);
+            $representative = Auth::user();            
             return view('calls.create')->with('representative', $representative);
         }
         
@@ -33,13 +32,13 @@ class CallController extends Controller
         //validation                        
         $request->validate([
             'representative_id' => 'required',
-            'number_of_calls' => 'required|integer|min:1',            
-            'positive' => 'required|integer|min:1',            
-            'got_admitted' => 'required|integer|min:1',                        
+            'number_of_calls' => 'required|integer|min:0',            
+            'positive' => 'required|integer|min:0',            
+            'got_admitted' => 'required|integer|min:0',                        
         ]);
 
         if(Auth::user()->isAdmin || Auth::user()->representative_id == $request->representative_id){
-            if( ($request->number_of_calls > $request->positive) && ($request->number_of_calls > $request->get_admitted) ){
+            if( ($request->number_of_calls > $request->positive) && ($request->number_of_calls > $request->got_admitted) ){
                 $call_entry = new Call();
                 $call_entry->representative_id = $request->representative_id;
                 $call_entry->number_of_calls = $request->number_of_calls;
@@ -56,13 +55,12 @@ class CallController extends Controller
         else{
             return redirect()->route('calls.create')->with('error', 'Access Denied !! Your Representative ID Does Not Match !!');
         }
-
                 
     }
 
     public function edit($id){
         $call = Call::where('id', $id)->with('user')->first();
-        if(Auth::user()->representative_id == $call->representative_id){
+        if(Auth::user()->isAdmin || Auth::user()->representative_id == $call->representative_id){
             return view('calls.edit')->with('call', $call);
         }
         else{
@@ -72,15 +70,18 @@ class CallController extends Controller
 
     public function update(Request $request){
         //validation 
-        
-        if(Auth::user()->representative_id == $call->representative_id){            
+        // dump($request->call_id);
+        $call = Call::where('id', $request->call_id)->first();
+        // dd($call->representative_id);        
+
+        if(Auth::user()->isAdmin ||  Auth::user()->representative_id == $call->representative_id){            
             $request->validate([            
-                'number_of_calls' => 'required|integer|min:1', 
-                'positive' => 'required|integer|min:1',            
-                'got_admitted' => 'required|integer|min:1',
+                'number_of_calls' => 'required|integer|min:0', 
+                'positive' => 'required|integer|min:0',            
+                'got_admitted' => 'required|integer|min:0',
             ]);                 
     
-            if( ($request->number_of_calls > $request->positive) && ($request->number_of_calls > $request->get_admitted) ){
+            if( ($request->number_of_calls > $request->positive) && ($request->number_of_calls > $request->got_admitted) ){
                 $call_entry = Call::find($request->call_id);
                 $call_entry->representative_id = $request->representative_id;
                 $call_entry->number_of_calls = $request->number_of_calls;
@@ -101,7 +102,7 @@ class CallController extends Controller
 
     public function delete($id){
         $call = Call::where('id', $id)->with('user')->first();        
-        if(Auth::user()->representative_id == $call->representative_id){
+        if(Auth::user()->isAdmin || Auth::user()->representative_id == $call->representative_id){
             return view('calls.delete')->with('call', $call);
         }
         else{
@@ -111,7 +112,7 @@ class CallController extends Controller
 
     public function destroy($id){
         $call = Call::find($id);
-        if(Auth::user()->representative_id == $call->representative_id){
+        if(Auth::user()->isAdmin || Auth::user()->representative_id == $call->representative_id){
             $call->delete();   
             return redirect()->route('calls.index');
         }
@@ -145,15 +146,43 @@ class CallController extends Controller
         
         $all_representatives = User::all();
         
-        $searchfromdate = Carbon::parse($request->fromdate)->subDay()->endOfDay()->format('Y-m-d');
-        $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-m-d');        
-        
-        if( $searchfromdate < $searchtodate ){                
-            $calls = Call::where('representative_id', $request->representative_id)->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();
-            return view('calls.generate_summary_with_users')->with('calls', $calls)->with('all_representatives', $all_representatives);
+        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
+        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');
+                
+        if( $searchfromdate < $searchtodate ){ 
+            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
+            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');
+            $calls = Call::where('representative_id', $request->representative_id)->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();            
+            $total_number_of_calls = $calls->sum('number_of_calls');               
+            $total_positive = $calls->sum('positive');               
+            $total_get_admitted = $calls->sum('get_admitted');                        
+
+            return view('calls.results_of_summary')
+            ->with('calls', $calls)
+            ->with('all_representatives', $all_representatives)
+            ->with('total_number_of_calls', $total_number_of_calls)
+            ->with('total_positive', $total_positive)
+            ->with('total_get_admitted', $total_get_admitted);
+        }
+        if( $searchfromdate == $searchtodate){  
+            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');            
+            $searchtodate = Carbon::parse($request->fromdate)->endOfDay()->format('Y-d-m H:i:s');                      
+            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->where('representative_id', $request->representative_id)->get();                         
+            $total_number_of_calls = $calls->sum('number_of_calls');               
+            $total_positive = $calls->sum('positive');               
+            $total_get_admitted = $calls->sum('get_admitted');             
+
+            //dd($total_number_of_calls);
+
+            return view('calls.results_of_summary')
+            ->with('calls', $calls)
+            ->with('all_representatives', $all_representatives)
+            ->with('total_number_of_calls', $total_number_of_calls)
+            ->with('total_positive', $total_positive)
+            ->with('total_get_admitted', $total_get_admitted);
         }        
-        else{                        
-            return view('calls.generate_summary_with_users')->with('error', 'The From Date has to be less the To Date !! ');                
+        if( $searchfromdate > $searchtodate){
+            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
         }        
     }
 
@@ -165,17 +194,43 @@ class CallController extends Controller
         ]);     
         
         $all_representatives = User::all();
+                
+        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
+        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');        
         
-        $searchfromdate = Carbon::parse($request->fromdate)->subDay()->endOfDay()->format('Y-m-d');
-        $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-m-d');
-                                    
         if( $searchfromdate < $searchtodate ){                
-            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->get();
-            return view('calls.generate_summary_without_users')->with('calls', $calls)->with('all_representatives', $all_representatives);
+            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
+            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');               
+            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->get();            
+            $total_number_of_calls = $calls->sum('number_of_calls');               
+            $total_positive = $calls->sum('positive');               
+            $total_get_admitted = $calls->sum('get_admitted');                         
+
+            return view('calls.results_of_summary')
+            ->with('calls', $calls)
+            ->with('all_representatives', $all_representatives)
+            ->with('total_number_of_calls', $total_number_of_calls)
+            ->with('total_positive', $total_positive)
+            ->with('total_get_admitted', $total_get_admitted);
         }        
-        else{                        
-            return view('calls.generate_summary_without_users')->with('error', 'The From Date has to be less the To Date !! ');    
+        if( $searchfromdate == $searchtodate){                                    
+            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');  
+            $searchtodate = Carbon::parse($request->fromdate)->endOfDay()->format('Y-d-m H:i:s');              
+            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->get();
+            $total_number_of_calls = $calls->sum('number_of_calls');               
+            $total_positive = $calls->sum('positive');               
+            $total_get_admitted = $calls->sum('get_admitted');
+
+            return view('calls.results_of_summary')
+            ->with('calls', $calls)
+            ->with('all_representatives', $all_representatives)
+            ->with('total_number_of_calls', $total_number_of_calls)
+            ->with('total_positive', $total_positive)
+            ->with('total_get_admitted', $total_get_admitted);
+        }
+        if( $searchfromdate > $searchtodate){
+            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
         }       
-        
+
     }
 }

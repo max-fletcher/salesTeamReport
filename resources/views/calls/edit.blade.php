@@ -27,7 +27,7 @@
         <input type="number" class="form-control" name="got_admitted" id="got_admitted" placeholder="Enter Number of Students Who Got Admitted" value="{{ $call->get_admitted }}"></input>
     </div>
 
-    <input type="hidden" class="form-control" name="call_id" id="call_" value="{{ $call->id }}"></input>
+    <input type="hidden" class="form-control" name="call_id" id="call_id" value="{{ $call->id }}"></input>
 
     <br>
     <input type="submit" class="btn btn-primary" value="Submit">
