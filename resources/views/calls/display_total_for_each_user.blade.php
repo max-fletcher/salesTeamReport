@@ -2,9 +2,9 @@
 
 @section('content')
 <h3> Total For Each User</h3>
-<h5 class="text-center">Searched Within Dates: <strong> {{$fromdate}} </strong> to <strong> {{$todate}} </strong> </h5>
-<br>
     @isset($user_totals)
+        <h5 class="text-center">Searched Within Dates: <strong> {{$fromdate}} </strong> to <strong> {{$todate}} </strong> </h5>
+        <br>
         <div class="my-3">                           
             <table class="table table-striped">
                 <thead>
@@ -40,6 +40,10 @@
             </table>
         </div>
     @else
-        <h1> Database Empty !! Enter Some Data to Display Totals. </h1>
+    <div class="text-center">
+        <h1> No Data Found !! </h1>
+        <h5> Please check dates. One or both of the dates may be incoherent.</h5>
+        <h5> Otherwise, no representatives and calls have been created.</h5>
+    </div>    
     @endisset    
 @endsection

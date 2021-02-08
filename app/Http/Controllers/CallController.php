@@ -142,47 +142,27 @@ class CallController extends Controller
             'fromdate' => 'required',            
             'todate' => 'required',
             'representative_id' => 'required'
-        ]);     
+        ]);                     
         
-        $all_representatives = User::all();
-        
-        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
-        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');
+        $searchfromdate = Carbon::createFromFormat('d/m/Y', $request->fromdate);
+        $searchtodate = Carbon::createFromFormat('d/m/Y', $request->todate);
                 
-        if( $searchfromdate < $searchtodate ){ 
-            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
-            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');
+        if( $searchfromdate <= $searchtodate ){ 
+            $searchfromdate = Carbon::parse($searchfromdate)->StartOfDay()->format('Y-m-d H:i:s');
+            $searchtodate = Carbon::parse($searchtodate)->endOfDay()->format('Y-m-d  H:i:s');
             $calls = Call::where('representative_id', $request->representative_id)->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();            
             $total_number_of_calls = $calls->sum('number_of_calls');               
             $total_positive = $calls->sum('positive');               
             $total_get_admitted = $calls->sum('get_admitted');                        
 
             return view('calls.results_of_summary')
-            ->with('calls', $calls)
-            ->with('all_representatives', $all_representatives)
+            ->with('calls', $calls)            
             ->with('total_number_of_calls', $total_number_of_calls)
             ->with('total_positive', $total_positive)
             ->with('total_get_admitted', $total_get_admitted);
-        }
-        if( $searchfromdate == $searchtodate){  
-            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');            
-            $searchtodate = Carbon::parse($request->fromdate)->endOfDay()->format('Y-d-m H:i:s');                      
-            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->where('representative_id', $request->representative_id)->get();                         
-            $total_number_of_calls = $calls->sum('number_of_calls');               
-            $total_positive = $calls->sum('positive');               
-            $total_get_admitted = $calls->sum('get_admitted');             
-
-            //dd($total_number_of_calls);
-
-            return view('calls.results_of_summary')
-            ->with('calls', $calls)
-            ->with('all_representatives', $all_representatives)
-            ->with('total_number_of_calls', $total_number_of_calls)
-            ->with('total_positive', $total_positive)
-            ->with('total_get_admitted', $total_get_admitted);
-        }        
+        }               
         if( $searchfromdate > $searchtodate){
-            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
+            return view('calls.results_of_summary');
         }        
     }
 
@@ -191,47 +171,28 @@ class CallController extends Controller
         $request->validate([            
             'fromdate' => 'required',            
             'todate' => 'required',            
-        ]);     
+        ]);                                
         
-        $all_representatives = User::all();
-                
-        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
-        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');        
+        $searchfromdate = Carbon::createFromFormat('d/m/Y', $request->fromdate);
+        $searchtodate = Carbon::createFromFormat('d/m/Y', $request->todate);   
         
-        if( $searchfromdate < $searchtodate ){                
-            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
-            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');               
+        if( $searchfromdate <= $searchtodate ){                         
+            $searchfromdate = Carbon::parse($searchfromdate)->StartOfDay()->format('Y-m-d H:i:s');
+            $searchtodate = Carbon::parse($searchtodate)->endOfDay()->format('Y-m-d  H:i:s');               
             $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->get();            
             $total_number_of_calls = $calls->sum('number_of_calls');               
             $total_positive = $calls->sum('positive');               
             $total_get_admitted = $calls->sum('get_admitted');                         
 
             return view('calls.results_of_summary')
-            ->with('calls', $calls)
-            ->with('all_representatives', $all_representatives)
+            ->with('calls', $calls)            
             ->with('total_number_of_calls', $total_number_of_calls)
             ->with('total_positive', $total_positive)
             ->with('total_get_admitted', $total_get_admitted);
-        }        
-        if( $searchfromdate == $searchtodate){                                    
-            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');  
-            $searchtodate = Carbon::parse($request->fromdate)->endOfDay()->format('Y-d-m H:i:s');              
-            $calls = Call::whereBetween('created_at', [$searchfromdate, $searchtodate])->get();
-            $total_number_of_calls = $calls->sum('number_of_calls');               
-            $total_positive = $calls->sum('positive');               
-            $total_get_admitted = $calls->sum('get_admitted');
-
-            return view('calls.results_of_summary')
-            ->with('calls', $calls)
-            ->with('all_representatives', $all_representatives)
-            ->with('total_number_of_calls', $total_number_of_calls)
-            ->with('total_positive', $total_positive)
-            ->with('total_get_admitted', $total_get_admitted);
-        }
-        if( $searchfromdate > $searchtodate){
-            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
+        }                
+        if( $searchfromdate > $searchtodate ){            
+            return view('calls.results_of_summary');                
         }       
-
     }
 
     public function find_total_for_each_user(){        
@@ -247,17 +208,18 @@ class CallController extends Controller
         
         $all_representatives = User::all();
                 
-        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
-        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');        
+        $searchfromdate = Carbon::createFromFormat('d/m/Y', $request->fromdate);
+        $searchtodate = Carbon::createFromFormat('d/m/Y', $request->todate);        
         
         if( $searchfromdate <= $searchtodate ){                
-            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
-            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');  
+            $searchfromdate = Carbon::parse($searchfromdate)->StartOfDay()->format('Y-m-d H:i:s');
+            $searchtodate = Carbon::parse($searchtodate)->endOfDay()->format('Y-m-d  H:i:s');
             
             $user_totals = collect();
 
             foreach($all_representatives as $representative){                         
-                $all_calls_by_user = Call::with('user')->where('representative_id',$representative->representative_id)->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();                
+                $all_calls_by_user = Call::with('user')->where('representative_id',$representative->representative_id)
+                ->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();                                
                 $total_calls_by_user = $all_calls_by_user->sum('number_of_calls');
                 $total_positive_by_user = $all_calls_by_user->sum('positive');
                 $total_got_admitted_by_user = $all_calls_by_user->sum('get_admitted');                
@@ -279,8 +241,8 @@ class CallController extends Controller
             ->with('todate', $request->todate);
         }        
 
-        if( $searchfromdate > $searchtodate){
-            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
+        if( $searchfromdate > $searchtodate ){
+            return view('calls.display_total_for_each_user');
         }       
     }
 
