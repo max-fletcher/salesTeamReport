@@ -233,4 +233,58 @@ class CallController extends Controller
         }       
 
     }
+
+    public function find_total_for_each_user(){        
+        return view('calls.total_for_each_user_within_dates');
+    }
+
+    public function calculate_total_for_each_user(Request $request){                                          
+
+        $request->validate([            
+            'fromdate' => 'required',            
+            'todate' => 'required',            
+        ]);             
+        
+        $all_representatives = User::all();
+                
+        $searchfromdate = Carbon::parse($request->fromdate)->format('Y-m-d');
+        $searchtodate = Carbon::parse($request->todate)->format('Y-m-d');        
+        
+        if( $searchfromdate <= $searchtodate ){                
+            $searchfromdate = Carbon::parse($request->fromdate)->StartOfDay()->format('Y-d-m H:i:s');
+            $searchtodate = Carbon::parse($request->todate)->endOfDay()->format('Y-d-m  H:i:s');  
+            
+            $user_totals = collect();
+
+            foreach($all_representatives as $representative){                         
+                $all_calls_by_user = Call::with('user')->where('representative_id',$representative->representative_id)->whereBetween('created_at', [$searchfromdate, $searchtodate])->get();                
+                $total_calls_by_user = $all_calls_by_user->sum('number_of_calls');
+                $total_positive_by_user = $all_calls_by_user->sum('positive');
+                $total_got_admitted_by_user = $all_calls_by_user->sum('get_admitted');                
+                $user_totals->push([
+                    'representative_id' => $representative->representative_id,
+                    'user_full_name' => $representative->name,                                        
+                    'user_username' => $representative->username,
+                    'total_calls_by_user' => $total_calls_by_user,
+                    'total_positive_by_user' => $total_positive_by_user,
+                    'total_got_admitted_by_user' => $total_positive_by_user,                    
+                ]);                
+            }  
+            
+            $user_totals = $user_totals->toArray();
+
+            return view('calls.display_total_for_each_user')
+            ->with('user_totals', $user_totals)
+            ->with('fromdate', $request->fromdate)
+            ->with('todate', $request->todate);
+        }        
+
+        if( $searchfromdate > $searchtodate){
+            return view('calls.results_of_summary')->with('error', 'The From Date has to be less the To Date !! ');                
+        }       
+    }
+
+    public function display_total_for_each_user(){
+
+    }    
 }

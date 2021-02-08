@@ -46,5 +46,9 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/calls/result_of_summary_with_users', [App\Http\Controllers\CallController::class, 'result_of_summary_with_users'])->name('calls.result_of_summary_with_users');
     Route::get('/calls/result_of_summary_without_users', [App\Http\Controllers\CallController::class, 'result_of_summary_without_users'])->name('calls.result_of_summary_without_users');
+    
+    Route::get('/calls/find_total_for_each_user', [App\Http\Controllers\CallController::class, 'find_total_for_each_user'])->name('calls.find_total_for_each_user');
+    Route::post('/calls/calculate_total_for_each_user', [App\Http\Controllers\CallController::class, 'calculate_total_for_each_user'])->name('calls.calculate_total_for_each_user');
+    Route::get('/calls/display_total_for_each_user', [App\Http\Controllers\CallController::class, 'display_total_for_each_user'])->name('calls.display_total_for_each_user');
 });
 

@@ -8,6 +8,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th> ID </th>
                 <th> Representative_ID </th>
                 <th> Name </th>
                 <th> No. of Calls </th>
@@ -15,9 +16,9 @@
                 <th> Got Admitted </th>    
                 <th> Date </th>                
                 {{--  LATER
-                    <th>Delete</th> 
-                --}}            
-                <th> Edit </th>                 
+                    <th> Edit </th>                 
+                    --}}            
+                <th>Delete</th> 
                 
                 
             </tr>        
@@ -25,6 +26,7 @@
         <tbody>            
             @foreach ($calls as $call)
             <tr>
+                <td> {{ $call->id }} </td>
                 <td> {{ $call->representative_id }} </td>
                 @isset($call->user->name)
                         <td> {{ $call->user->name }} </td>
@@ -44,8 +46,8 @@
                     <td> <p class="btn btn-dark"> Not Your Account </p> </td>
                     <td> <p class="btn btn-dark"> Not Your Account </p> </td>
                 @endif                 --}} 
-                @if (auth()->user()->isAdmin || auth()->user()->representative_id == $call->representative_id)                
-                    <td> <a class="btn btn-danger" href="{{ route('calls.delete', $call->id) }}"> Delete </a> </td>                
+                @if (auth()->user()->isAdmin || auth()->user()->representative_id == $call->representative_id)
+                    <td> <a class="btn btn-danger" href="{{ route('calls.delete', $call->id) }}"> Delete </a> </td>
                 @else                
                     <td> <p class="btn btn-dark"> Not Your Account </p> </td>
                 @endif

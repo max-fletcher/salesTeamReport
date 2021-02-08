@@ -108,9 +108,13 @@ class RepresentativeController extends Controller
     }
 
     public function delete($representative_id){
+        $representative = User::where('representative_id', $representative_id)->first();
         if(Auth::user()->isAdmin){
-            $representative = User::where('representative_id', $representative_id)->first();
-            return view('representatives.delete')->with('representative', $representative);   
+            if(!$representative->isAdmin){
+                return view('representatives.delete')->with('representative', $representative);                   
+            }else{
+                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admins or Self !!');    
+            }
         }
         else{
             return redirect()->route('representatives.index')->with('error', 'Access Denied !! Admin privilege is required.');
@@ -118,13 +122,18 @@ class RepresentativeController extends Controller
     }
 
     public function destroy($id){ 
+
+        $representative = User::find($id);        
         if(Auth::user()->isAdmin){
-            $representative = User::find($id);        
-            $representative->delete();
-            return redirect()->route('representatives.index')->with('success', 'Representative Deleted Successfully !!');
+            if(!$representative->isAdmin){
+                $representative->delete();
+                return redirect()->route('representatives.index')->with('success', 'Representative Deleted Successfully !!');
+            }else{
+                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admins or Self !!');    
+            }
         }
         else{
             return redirect()->route('calls.index')->with('error', 'Access Denied !! Admin privilege is required.');
-        }                
+        }
     }
 }

@@ -77,6 +77,7 @@
                             <a class="dropdown-item" href="{{ route('calls.create') }}"> Create Call Entry </a>
                             <a class="dropdown-item" href="{{ route('calls.generate_summary_with_users') }}"> Generate Summary Of Calls(With Users)</a>
                             <a class="dropdown-item" href="{{ route('calls.generate_summary_without_users') }}"> Generate Summary Of Calls(Without Users)</a>
+                            <a class="dropdown-item" href="{{ route('calls.find_total_for_each_user') }}"> Total Calls for Each User </a>
                         </div>
                     </li>
 
