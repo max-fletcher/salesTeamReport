@@ -31,10 +31,10 @@ class CallController extends Controller
     public function store(Request $request){        
         //validation                        
         $request->validate([
-            'representative_id' => 'required',
-            'number_of_calls' => 'required|integer|min:0',            
-            'positive' => 'required|integer|min:0',            
-            'got_admitted' => 'required|integer|min:0',                        
+            'representative_id' => 'required|min:0|max:16777215|numeric',
+            'number_of_calls' => 'required|numeric|min:1|max:16777215',            
+            'positive' => 'required|numeric|min:1|max:16777215',            
+            'got_admitted' => 'required|numeric|min:1|max:16777215',
         ]);
 
         if(Auth::user()->isAdmin || Auth::user()->representative_id == $request->representative_id){
@@ -76,9 +76,9 @@ class CallController extends Controller
 
         if(Auth::user()->isAdmin ||  Auth::user()->representative_id == $call->representative_id){            
             $request->validate([            
-                'number_of_calls' => 'required|integer|min:0', 
-                'positive' => 'required|integer|min:0',            
-                'got_admitted' => 'required|integer|min:0',
+                'number_of_calls' => 'required|numeric|min:1|max:16777215',            
+                'positive' => 'required|numeric|min:1|max:16777215',            
+                'got_admitted' => 'required|numeric|min:1|max:16777215',
             ]);                 
     
             if( ($request->number_of_calls > $request->positive) && ($request->number_of_calls > $request->got_admitted) ){
@@ -101,7 +101,10 @@ class CallController extends Controller
     }
 
     public function delete($id){
-        $call = Call::where('id', $id)->with('user')->first();        
+        $call = Call::where('id', $id)->with('user')->first();  
+        if(!isset($call)){
+            return redirect()->route('calls.index')->with('error', 'No Calls with such an ID exists !!');
+        }
         if(Auth::user()->isAdmin || Auth::user()->representative_id == $call->representative_id){
             return view('calls.delete')->with('call', $call);
         }
@@ -112,6 +115,9 @@ class CallController extends Controller
 
     public function destroy($id){
         $call = Call::find($id);
+        if(!isset($call)){
+            return redirect()->route('calls.index')->with('error', 'No Calls with such an ID exists !!');
+        }
         if(Auth::user()->isAdmin || Auth::user()->representative_id == $call->representative_id){
             $call->delete();   
             return redirect()->route('calls.index');
@@ -163,7 +169,7 @@ class CallController extends Controller
         }               
         if( $searchfromdate > $searchtodate){
             return view('calls.results_of_summary');
-        }        
+        }
     }
 
     public function retrieve_summary_without_users(Request $request){                                          
@@ -229,7 +235,7 @@ class CallController extends Controller
                     'user_username' => $representative->username,
                     'total_calls_by_user' => $total_calls_by_user,
                     'total_positive_by_user' => $total_positive_by_user,
-                    'total_got_admitted_by_user' => $total_positive_by_user,                    
+                    'total_got_admitted_by_user' => $total_got_admitted_by_user,                    
                 ]);                
             }  
             
@@ -244,9 +250,5 @@ class CallController extends Controller
         if( $searchfromdate > $searchtodate ){
             return view('calls.display_total_for_each_user');
         }       
-    }
-
-    public function display_total_for_each_user(){
-
-    }    
+    }   
 }

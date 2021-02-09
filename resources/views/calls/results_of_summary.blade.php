@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<h3> Results of Summary </h3>
-    @isset($calls)
+@isset($calls)
     <div class="my-3">
+        <h3> Results of Summary </h3>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th> Representative_ID </th>
-                    <th> Name </th>
+                    <th> Full Name </th>
                     <th> No. of Calls </th>
                     <th> Positive </th>
                     <th> Got Admitted </th>    
@@ -49,10 +49,9 @@
         </table>
     </div>
     @else
-        <div class="text-center">
-            <h1> No Data Found !! </h1>
-            <h5> Please check dates. One or both of the dates may be incoherent.</h5>
-            <h5>  Otherwise, no data for the current date range is available. </h5>
+        <div class="text-center"> 
+            <br>           
+            <h2> The "From Date" is greater than the "To Date" field !! </h2>
         </div>
     @endisset    
 

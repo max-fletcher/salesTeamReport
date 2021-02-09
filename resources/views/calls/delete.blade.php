@@ -5,7 +5,7 @@
     <div class="row justify-content-center">                                    
         <div class="card text-center" style="width: 70rem;">
             <div class="card-body">
-                <h1>Are You Sure You Want to Delete the Following Call Entry ??</h1>
+                <h1>Are You Sure You Want to Delete the Following Call Entry ??</h1>                
                 
                 <ul class="list-group list-group-flush">                    
                     <h5> <li class="list-group-item"> Representative ID: {{ $call->representative_id }}</li> </h5>

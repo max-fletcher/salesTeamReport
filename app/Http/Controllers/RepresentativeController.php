@@ -28,11 +28,11 @@ class RepresentativeController extends Controller
         if(Auth::user()->isAdmin){
             //validation
             $request->validate([
-                'representative_id' => 'required|min:1|unique:users,representative_id',
-                'name' => 'required|string|max:255',            
+                'representative_id' => 'required|min:0|max:16777215|numeric|unique:users,representative_id',
+                'name' => 'required|string|min:3|max:255',
                 'username' => 'required|string|min:3|max:255|unique:users',
-                'password' => 'required|string|min:8',
-                'confirm_password' => 'required|string|min:8'
+                'password' => 'required|string|min:8|max:255',
+                'confirm_password' => 'required|string|min:8|max:255'
             ]);
                                 
             $duplicate_user = User::where('representative_id', $request->representative)->first();
@@ -78,8 +78,8 @@ class RepresentativeController extends Controller
     public function update(Request $request){        
         if(Auth::user()->isAdmin || (Auth::user()->representative_id == $request->representative_id) ){               
             $request->validate([
-                'representative_id' => 'required|min:1',
-                'name' => 'required|string|max:255',                                  
+                'representative_id' => 'required|min:1|max:16777215',
+                'name' => 'required|string|min:3|max:255',                                  
             ]);                                    
             
             $duplicate_user = User::where('representative_id', $request->representative_id)->first();            
@@ -109,11 +109,14 @@ class RepresentativeController extends Controller
 
     public function delete($representative_id){
         $representative = User::where('representative_id', $representative_id)->first();
+        if(!isset($representative)){
+            return redirect()->route('representatives.index')->with('error', 'Representative with that ID doesn\'t exist !!');    
+        }
         if(Auth::user()->isAdmin){
             if(!$representative->isAdmin){
-                return view('representatives.delete')->with('representative', $representative);                   
+                return view('representatives.delete')->with('representative', $representative);
             }else{
-                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admins or Self !!');    
+                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admin or Self !!');    
             }
         }
         else{
@@ -123,13 +126,16 @@ class RepresentativeController extends Controller
 
     public function destroy($id){ 
 
-        $representative = User::find($id);        
+        $representative = User::find($id);
+        if(!isset($representative)){
+            return redirect()->route('representatives.index')->with('error', 'Representative with that ID doesn\'t exist !!');    
+        }        
         if(Auth::user()->isAdmin){
             if(!$representative->isAdmin){
                 $representative->delete();
                 return redirect()->route('representatives.index')->with('success', 'Representative Deleted Successfully !!');
             }else{
-                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admins or Self !!');    
+                return redirect()->route('representatives.index')->with('error', 'Cannot Delete Admin or Self !!');    
             }
         }
         else{

@@ -33,8 +33,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/calls/index', [App\Http\Controllers\CallController::class, 'index'])->name('calls.index');
     Route::get('/calls/create', [App\Http\Controllers\CallController::class, 'create'])->name('calls.create');
     Route::post('/calls/store', [App\Http\Controllers\CallController::class, 'store'])->name('calls.store');
-    Route::get('/calls/edit/{id}', [App\Http\Controllers\CallController::class, 'edit'])->name('calls.edit');
-    Route::patch('/calls/update', [App\Http\Controllers\CallController::class, 'update'])->name('calls.update');
+    //Route::get('/calls/edit/{id}', [App\Http\Controllers\CallController::class, 'edit'])->name('calls.edit');
+    //Route::patch('/calls/update', [App\Http\Controllers\CallController::class, 'update'])->name('calls.update');
     Route::get('/calls/delete/{id}', [App\Http\Controllers\CallController::class, 'delete'])->name('calls.delete');
     Route::delete('/calls/destroy/{id}', [App\Http\Controllers\CallController::class, 'destroy'])->name('calls.destroy');
     Route::get('/calls/display_for_user/{representative_id}', [App\Http\Controllers\CallController::class, 'display_for_user'])->name('calls.display_for_user');

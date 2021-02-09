@@ -11,7 +11,7 @@
       </div>      
       
       <div class="form-group">
-        <label for="name">Name</label>
+        <label for="name">Full Name</label>
         <input type="text" class="form-control" name="name" id="name" placeholder="Enter Representative Name" value="{{ old('name') }}"></input>
       </div>
 

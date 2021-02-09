@@ -12,12 +12,14 @@
             {{-- LATER
               <th>Edit</th>
               @endif 
-            --}}       
-              
+            --}}                     
             @if (auth()->user()->isAdmin)
               <th>Delete</th>                                       
             @endif
-            
+
+            @if (!auth()->user()->isAdmin)
+              <th> Roles </th>                                       
+            @endif            
           </tr>
         </thead>
         <tbody>
@@ -37,7 +39,16 @@
                     <td> <p class="btn btn-dark"> Not Your Account </p> </td>
                   @endif                  
                 @endif 
-              --}}                      
+              --}}
+              @if (!auth()->user()->isAdmin)
+                <th> 
+                  @if($representative->isAdmin)
+                  <li class="btn btn-dark"> Admin </li>
+                  @else
+                  <li class="btn btn-info"> User </li>
+                  @endif </th>
+              @endif            
+
               @if(auth()->user()->isAdmin)
                 @if (auth()->user()->representative_id == $representative->id)
                   <td> <li class="btn btn-dark"> Cannot Delete Admin </li> </td>

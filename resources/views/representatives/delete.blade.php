@@ -2,15 +2,15 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-
+    <div class="row justify-content-center">        
         <div class="card text-center" style="width: 70rem;">
             <div class="card-body">
                 <h1>Are You Sure You Want to Delete the Following Representative ??</h1>
                 
                 <ul class="list-group list-group-flush">                    
                     <h5> <li class="list-group-item"> Representative ID: {{ $representative->representative_id }} </li> </h5>
-                    <h5> <li class="list-group-item"> Representative Name: {{ $representative->name }} </li> </h5>                                        
+                    <h5> <li class="list-group-item"> Representative's Full Name: {{ $representative->name }} </li> </h5>
+                    <h5> <li class="list-group-item"> Representative's  Username: {{ $representative->username }} </li> </h5>
                 </ul>
 
                 <div class="d-flex flex-row justify-content-center">

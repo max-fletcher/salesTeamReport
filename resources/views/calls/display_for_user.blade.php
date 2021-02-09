@@ -9,7 +9,7 @@
         <thead>
             <tr>
                 <th> Representative_ID </th>
-                <th> Name </th>
+                <th> Full Name </th>
                 <th> No. of Calls </th>
                 <th> Positive </th>
                 <th> Got Admitted </th>    

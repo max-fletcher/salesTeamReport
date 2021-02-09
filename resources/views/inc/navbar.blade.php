@@ -19,7 +19,7 @@
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            <a class="nav-link active" href="{{ route('login') }}">{{ __('Login') }}</a>
                         </li>
                     @endif
                     
@@ -44,35 +44,34 @@
                     </li> --}}
 
                     @if (!Auth::user()->isAdmin)                     
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown @if (\Request::is('representative/*')) active @endif">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Representatives
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">                                
-                                <a class="dropdown-item" href="{{ route('representatives.index') }}"> See All Representatives </a>                                                               
-                                <a class="dropdown-item" href="{{ route('calls.display_for_user', auth()->user()->representative_id) }}"> Your Call Entries </a>                                
+                                <a class="dropdown-item" href="{{ route('representatives.index') }}"> See All Representatives </a>                                                                                                                               
                             </div>
                         </li>                                     
                     @endif  
 
                     @if (Auth::user()->isAdmin)                     
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown @if (\Request::is('representative/*')) active @endif">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Representatives
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">                                
                                 <a class="dropdown-item" href="{{ route('representatives.index') }}"> See All Representatives </a>                                                               
-                                <a class="dropdown-item" href="{{ route('representatives.create') }}"> Create Representatives </a>
-                                <a class="dropdown-item" href="{{ route('calls.display_for_user', auth()->user()->representative_id) }}"> Your Call Entries </a>                                
+                                <a class="dropdown-item" href="{{ route('representatives.create') }}"> Create Representatives </a>                                
                             </div>
                         </li>                        
                     @endif  
 
-                    <li class="nav-item dropdown">
+                    <li class="nav-item dropdown @if (\Request::is('calls/*')) active @endif">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Calls
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{{ route('calls.display_for_user', auth()->user()->representative_id) }}"> Your Call Entries </a>
                             <a class="dropdown-item" href="{{ route('calls.index') }}"> Summary of Calls </a>
                             <a class="dropdown-item" href="{{ route('calls.create') }}"> Create Call Entry </a>
                             <a class="dropdown-item" href="{{ route('calls.generate_summary_with_users') }}"> Generate Summary Of Calls(With Users)</a>
@@ -103,3 +102,6 @@
         </div>
     </div>
 </nav>
+
+{{-- /////////////////////////////////////// --}}
+

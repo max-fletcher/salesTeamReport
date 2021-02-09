@@ -41,9 +41,8 @@
         </div>
     @else
     <div class="text-center">
-        <h1> No Data Found !! </h1>
-        <h5> Please check dates. One or both of the dates may be incoherent.</h5>
-        <h5> Otherwise, no representatives and calls have been created.</h5>
+        <br>
+        <h2> The "From Date" is greater than the "To Date" field !! </h2>
     </div>    
     @endisset    
 @endsection
